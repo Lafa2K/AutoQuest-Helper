@@ -1,4 +1,4 @@
-# ZERK QUEST
+# AutoQuest Helper
 
 Automacao em blocos para a cadeia chinesa do Blue Zerk e para as primeiras quests de Inventory Expansion.
 

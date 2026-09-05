@@ -601,6 +601,8 @@ INVENTORY_TRAIN_CHECK_DELAY = 2.0
 INVENTORY_RETURN_SCROLL_DELAY = 3.0
 INVENTORY_TOWN_CHECK_DELAY = 4.0
 INVENTORY_REVERSE_WIND_COMMAND = "reverse,location,Wind Town"
+INVENTORY_PATH_STUCK_SECONDS = 5.0
+INVENTORY_PATH_PROGRESS_EPSILON = 4.0
 HUNTER_AUTO_PATH_TIMEOUT = 45.0
 EXORCIST_AUTO_PATH_TIMEOUT = 25.0
 EXORCIST_AUTO_PATH_MAX_RETRIES = 2
@@ -748,6 +750,9 @@ inventory_path_started_at = 0.0
 inventory_path_retries = 0
 inventory_target = None
 inventory_target_kind = ""
+inventory_last_distance = 999999.0
+inventory_last_progress_at = 0.0
+inventory_last_progress_log_at = 0.0
 handin_reward_retry_count = 0
 quest_accept_name_index = 0
 post_accept_ok_sent = False
@@ -1636,6 +1641,7 @@ def inventory_target_pos(kind):
 
 def start_inventory_path(kind, reason, reset_retry=True):
     global inventory_path_started_at, inventory_path_retries, inventory_target, inventory_target_kind
+    global inventory_last_distance, inventory_last_progress_at, inventory_last_progress_log_at
     stop_bot()
     stop_script()
     target = inventory_target_pos(kind)
@@ -1649,6 +1655,9 @@ def start_inventory_path(kind, reason, reset_retry=True):
     inventory_target = target
     inventory_target_kind = kind
     inventory_path_started_at = time.time()
+    inventory_last_distance = get_distance_to(x, y)
+    inventory_last_progress_at = time.time()
+    inventory_last_progress_log_at = 0.0
     cmd = "path,%d,%d,%d,%d" % (int(region), int(x), int(y), int(z))
     zlog(reason)
     try:
@@ -1670,6 +1679,36 @@ def retry_inventory_path():
     zlog("INVENTORY PATH travou; recalculando do ponto atual (%d/%d)." %
          (inventory_path_retries, AUTO_PATH_MAX_RETRIES))
     start_inventory_path(inventory_target_kind or "NPC", "INVENTORY retry path.", False)
+
+def inventory_path_progress_watchdog(retry_fn, retries, max_retries):
+    """Recalcula a rota quando o personagem deixa de se aproximar do destino."""
+    global inventory_last_distance, inventory_last_progress_at, inventory_last_progress_log_at
+    if not inventory_target or inventory_path_started_at <= 0.0:
+        return False
+    if time.time() - inventory_path_started_at < PATH_START_GRACE_SECONDS:
+        return False
+
+    target = inventory_target
+    distance = get_distance_to(target[1], target[2])
+    now = time.time()
+    if distance + INVENTORY_PATH_PROGRESS_EPSILON < inventory_last_distance:
+        inventory_last_distance = distance
+        inventory_last_progress_at = now
+        if now - inventory_last_progress_log_at >= 8.0:
+            zlog("INVENTORY PATH PROGRESS -> destino %.1f m" % distance)
+            inventory_last_progress_log_at = now
+        return False
+
+    if now - inventory_last_progress_at < INVENTORY_PATH_STUCK_SECONDS:
+        return False
+    if retries >= max_retries:
+        return False
+
+    zlog("INVENTORY PATH WATCHDOG -> distancia nao diminui ha %.1fs; recalculando." %
+         (now - inventory_last_progress_at))
+    inventory_last_progress_at = now
+    retry_fn()
+    return True
 
 def start_inventory_training():
     qdef = current_quest()
@@ -3474,6 +3513,8 @@ def event_loop():
                 start_inventory_path("MOB", "Inventory ativa/incompleta -> area de mob.")
             else:
                 set_state(STATE_ACCEPT, 0.50)
+        elif inventory_path_progress_watchdog(retry_inventory_path, inventory_path_retries, AUTO_PATH_MAX_RETRIES):
+            return
         elif path_watchdog_ready(inventory_path_started_at) and path_watchdog("INVENTORY NPC", retry_inventory_path, inventory_path_retries, AUTO_PATH_MAX_RETRIES):
             return
         elif inventory_path_started_at > 0.0 and time.time() - inventory_path_started_at >= AUTO_PATH_TIMEOUT:
@@ -3493,6 +3534,8 @@ def event_loop():
             zlog("CHEGOU na area mob Inventory | Q%d | distancia=%.1f" %
                  (int(qdef["order"]) if qdef else 0, dist))
             start_inventory_training()
+        elif inventory_path_progress_watchdog(retry_inventory_path, inventory_path_retries, AUTO_PATH_MAX_RETRIES):
+            return
         elif path_watchdog_ready(inventory_path_started_at) and path_watchdog("INVENTORY MOB", retry_inventory_path, inventory_path_retries, AUTO_PATH_MAX_RETRIES):
             return
         elif inventory_path_started_at > 0.0 and time.time() - inventory_path_started_at >= AUTO_PATH_TIMEOUT:
