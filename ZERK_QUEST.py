@@ -3589,7 +3589,7 @@ def event_loop():
     if state == STATE_INVENTORY_GO_NPC:
         target = inventory_target or inventory_target_pos("NPC")
         dist = get_distance_to(target[1], target[2]) if target else 999999.0
-        if dist <= INVENTORY_NPC_ARRIVAL_DISTANCE or is_current_inventory_npc_visible():
+        if dist <= INVENTORY_NPC_ARRIVAL_DISTANCE:
             qdef = current_quest()
             status = quest_status()
             zlog("CHEGOU no NPC Inventory | Q%d | distancia=%.1f | STATUS=%s" %
