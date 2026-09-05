@@ -69,14 +69,12 @@ pButton("blue", "btnStartQ1", "QUEST 1", 10, 190)
 pButton("blue", "btnStartQ2", "QUEST 2", 110, 190)
 pButton("blue", "btnStartQ3", "QUEST 3", 210, 190)
 pButton("blue", "btnStartQ4", "QUEST 4", 310, 190)
+pButton("blue", "btnStopQ1", "STOP", 410, 190)
 pButton("blue", "btnStartQ5", "QUEST 5", 10, 225)
 pButton("blue", "btnStartQ6", "QUEST 6", 110, 225)
 pButton("blue", "btnStartQ7", "QUEST 7", 210, 225)
 pButton("blue", "btnStartQ8", "QUEST 8", 310, 225)
-
-pButton("blue", "btnStopQ1", "STOP", 10, 265)
-pButton("blue", "btnResumeQuest", "RESUME", 110, 265)
-pButton("blue", "btnQuestMobOn", "CHECK QUEST MOB", 210, 265)
+pButton("blue", "btnQuestMobOn", "CHECK QUEST MOB", 410, 225)
 
 pLabel("blue", "Setup", 10, 305)
 cbxFindAutomaticPath = pCheckBox("blue", "", "Find automatic path", 10, 330)
@@ -101,11 +99,10 @@ pButton("inventory", "btnStartInvQ1", "QUEST 1", 10, 190)
 pButton("inventory", "btnStartInvQ2", "QUEST 2", 110, 190)
 pButton("inventory", "btnStartInvQ3", "QUEST 3", 210, 190)
 pButton("inventory", "btnStartInvQ4", "QUEST 4", 310, 190)
-pButton("inventory", "btnStopQ1", "STOP", 10, 230)
-pButton("inventory", "btnResumeInventory", "RESUME", 110, 230)
-pLabel("inventory", "Setup", 10, 270)
-cbxInventoryReverseWind = pCheckBox("inventory", "", "Use Reverse Scroll: Wind Town", 10, 295)
-pLabel("inventory", "Training areas: attack radius 25 / pick radius 50. Return uses selected Blue Zerk return checkbox.", 10, 325)
+pButton("inventory", "btnStopQ1", "STOP", 410, 190)
+pLabel("inventory", "Setup", 10, 235)
+cbxInventoryReverseWind = pCheckBox("inventory", "", "Use Reverse Scroll: Wind Town", 10, 260)
+pLabel("inventory", "Training areas: attack radius 25 / pick radius 50. Return uses selected Blue Zerk return checkbox.", 10, 290)
 
 ZERK_1_QUESTS = [
     {"order": 1, "id": 346, "npc": "General Sonhyeon", "turnin_npc": "General Sonhyeon", "name": "Army Test 1 (Chinese)", "servername": "QNO_CH_HWAN_1_1", "state": "CURRENT"},
@@ -583,6 +580,8 @@ Q4_TOWN_CHECK_DELAY = 4.0
 RETURN_SCROLL_NORMAL_COMMAND = "use,returnscroll"
 RETURN_SCROLL_SPECIAL_COMMAND = "use,Special Return Scroll"
 RETURN_SCROLL_INSTANT_COMMAND = "use,Instant Return Scroll"
+RETURN_SCROLL_RETRY_DELAY = 8.0
+RETURN_SCROLL_MAX_ATTEMPTS = 3
 Q5_HUNTER_TALK_OPTION = 0x06
 Q5_HUNTER_REWARD_DELAY = 4.00
 Q6_MANUAL_CAPTURE_MESSAGE = "ZERK QUEST: DO THIS PART MANUALLY. After collecting the spirit, press QUEST 6 again to resume and finish the quest automatically."
@@ -759,6 +758,11 @@ path_watch_last_pos = None
 path_watch_last_moved_at = 0.0
 last_dialog_npc_uid = None
 last_dialog_npc_name = ""
+return_scroll_attempts = 0
+return_scroll_commands = []
+return_scroll_wait_state = ""
+return_scroll_label = ""
+return_scroll_delay = 0.0
 
 def zlog(msg):
     log("[ZERK] " + str(msg))
@@ -1623,6 +1627,34 @@ def selected_return_scroll_command():
         pass
     return RETURN_SCROLL_SPECIAL_COMMAND
 
+def selected_return_scroll_commands():
+    selected = []
+    try:
+        if QtBind.isChecked(gui, cbxReturnInstant):
+            selected.append(RETURN_SCROLL_INSTANT_COMMAND)
+    except:
+        pass
+    try:
+        if QtBind.isChecked(gui, cbxReturnSpecial):
+            selected.append(RETURN_SCROLL_SPECIAL_COMMAND)
+    except:
+        pass
+    try:
+        if QtBind.isChecked(gui, cbxReturnNormal):
+            selected.append(RETURN_SCROLL_NORMAL_COMMAND)
+    except:
+        pass
+
+    fallback = [
+        RETURN_SCROLL_SPECIAL_COMMAND,
+        RETURN_SCROLL_NORMAL_COMMAND,
+        RETURN_SCROLL_INSTANT_COMMAND
+    ]
+    for command in fallback:
+        if command not in selected:
+            selected.append(command)
+    return selected
+
 def should_inventory_reverse_wind():
     try:
         return bool(QtBind.isChecked(gui, cbxInventoryReverseWind))
@@ -2357,10 +2389,32 @@ def use_spirit_bell():
         capture_on()
         set_state(STATE_DONE)
 
-def use_return_scroll(wait_state=STATE_Q3_WAIT_TOWN, label="Q3", delay=Q3_TOWN_CHECK_DELAY, command="use,returnscroll"):
+def use_return_scroll(wait_state=STATE_Q3_WAIT_TOWN, label="Q3", delay=Q3_TOWN_CHECK_DELAY, command="use,returnscroll", reset_attempts=True, fixed_command=False):
+    global return_scroll_attempts, return_scroll_commands, return_scroll_wait_state, return_scroll_label, return_scroll_delay
     stop_bot()
     stop_script()
-    zlog("%s -> usando scroll de retorno para Jangan." % label)
+    if reset_attempts:
+        return_scroll_attempts = 0
+        if fixed_command and command:
+            return_scroll_commands = [command]
+        else:
+            return_scroll_commands = selected_return_scroll_commands()
+            if command and command in return_scroll_commands:
+                return_scroll_commands.remove(command)
+                return_scroll_commands.insert(0, command)
+            elif command:
+                return_scroll_commands.insert(0, command)
+        return_scroll_wait_state = wait_state
+        return_scroll_label = label
+        return_scroll_delay = delay
+
+    if not return_scroll_commands:
+        return_scroll_commands = [command or RETURN_SCROLL_SPECIAL_COMMAND]
+
+    command = return_scroll_commands[min(return_scroll_attempts, len(return_scroll_commands) - 1)]
+    return_scroll_attempts += 1
+    zlog("%s -> using return scroll attempt %d/%d." %
+         (label, return_scroll_attempts, RETURN_SCROLL_MAX_ATTEMPTS))
     zlog(command)
     try:
         start_script(command + "\n")
@@ -2369,6 +2423,19 @@ def use_return_scroll(wait_state=STATE_Q3_WAIT_TOWN, label="Q3", delay=Q3_TOWN_C
         zlog("RETURN SCROLL ERRO: %s" % str(ex))
         capture_on()
         set_state(STATE_DONE)
+
+def retry_return_scroll_if_needed():
+    if return_scroll_attempts >= RETURN_SCROLL_MAX_ATTEMPTS:
+        zlog("%s -> return scroll did not teleport after %d attempts; manual action required." %
+             (return_scroll_label or "RETURN", RETURN_SCROLL_MAX_ATTEMPTS))
+        capture_on()
+        set_state(STATE_DONE)
+        return
+    use_return_scroll(return_scroll_wait_state or state,
+                      return_scroll_label or "RETURN",
+                      RETURN_SCROLL_RETRY_DELAY,
+                      None,
+                      False)
 
 def nudge_and_retry_exorcist_path():
     global exorcist_path_retries
@@ -3571,12 +3638,16 @@ def event_loop():
         return
 
     if state == STATE_INVENTORY_RETURN_SCROLL:
-        use_return_scroll(STATE_INVENTORY_WAIT_TOWN, "INVENTORY", INVENTORY_TOWN_CHECK_DELAY, selected_return_scroll_command())
+        qdef = current_quest()
+        if qdef and int(qdef["order"]) == 4 and should_inventory_reverse_wind():
+            use_return_scroll(STATE_INVENTORY_WAIT_TOWN, "INVENTORY Q4 REVERSE", INVENTORY_TOWN_CHECK_DELAY, INVENTORY_REVERSE_WIND_COMMAND, True, True)
+        else:
+            use_return_scroll(STATE_INVENTORY_WAIT_TOWN, "INVENTORY", INVENTORY_TOWN_CHECK_DELAY, selected_return_scroll_command())
         return
 
     if state == STATE_INVENTORY_WAIT_TOWN:
-        zlog("Aguardando TP do Return Scroll para entregar Inventory...")
-        set_state(STATE_INVENTORY_WAIT_TOWN, INVENTORY_TOWN_CHECK_DELAY)
+        zlog("Waiting for Inventory return teleport...")
+        retry_return_scroll_if_needed()
         return
 
     if state == STATE_INVENTORY_REVERSE_WIND:
@@ -3711,8 +3782,8 @@ def event_loop():
         return
 
     if state == STATE_Q3_WAIT_TOWN:
-        zlog("Aguardando TP do Return Scroll...")
-        set_state(STATE_Q3_WAIT_TOWN, Q3_TOWN_CHECK_DELAY)
+        zlog("Waiting for Q3 return teleport...")
+        retry_return_scroll_if_needed()
         return
 
     if state == STATE_Q4_RETURN_SCROLL:
@@ -3720,13 +3791,13 @@ def event_loop():
         return
 
     if state == STATE_Q4_WAIT_TOWN:
-        zlog("Aguardando TP do Return Scroll selecionado...")
-        set_state(STATE_Q4_WAIT_TOWN, Q4_TOWN_CHECK_DELAY)
+        zlog("Waiting for Q4 return teleport...")
+        retry_return_scroll_if_needed()
         return
 
     if state == STATE_Q6_WAIT_TOWN:
-        zlog("Aguardando TP do Return Scroll para entregar na Exorcist...")
-        set_state(STATE_Q6_WAIT_TOWN, Q6_TOWN_CHECK_DELAY)
+        zlog("Waiting for return teleport to turn in at Exorcist...")
+        retry_return_scroll_if_needed()
         return
 
     if state == STATE_ACCEPT_NEXT:

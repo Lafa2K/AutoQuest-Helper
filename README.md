@@ -86,7 +86,6 @@ Buttons:
 ```text
 QUEST 1-8       start or resume that quest block
 STOP            stop and reset the current automation state
-RESUME          detect the current step and continue
 CHECK QUEST MOB enable quest monster attack support
 ```
 
@@ -168,7 +167,7 @@ TALK AGAIN WITH HER WITH FULL ZERK.
 KILL THE SPIRIT WHILE ZERK IS ACTIVE.
 ```
 
-After finishing the manual part, press the same quest button again or press `RESUME`.
+After finishing the manual part, press the same quest button again.
 
 ## Inventory Expansion
 
