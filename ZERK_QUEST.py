@@ -3605,7 +3605,9 @@ def event_loop():
             return
         elif path_watchdog_ready(inventory_path_started_at) and path_watchdog("INVENTORY NPC", retry_inventory_path, inventory_path_retries, AUTO_PATH_MAX_RETRIES):
             return
-        elif inventory_path_started_at > 0.0 and time.time() - inventory_path_started_at >= AUTO_PATH_TIMEOUT:
+        elif (inventory_path_started_at > 0.0 and
+              time.time() - inventory_path_started_at >= AUTO_PATH_TIMEOUT and
+              time.time() - inventory_last_progress_at >= AUTO_PATH_TIMEOUT):
             if inventory_path_retries < AUTO_PATH_MAX_RETRIES:
                 retry_inventory_path()
             else:
@@ -3626,7 +3628,9 @@ def event_loop():
             return
         elif path_watchdog_ready(inventory_path_started_at) and path_watchdog("INVENTORY MOB", retry_inventory_path, inventory_path_retries, AUTO_PATH_MAX_RETRIES):
             return
-        elif inventory_path_started_at > 0.0 and time.time() - inventory_path_started_at >= AUTO_PATH_TIMEOUT:
+        elif (inventory_path_started_at > 0.0 and
+              time.time() - inventory_path_started_at >= AUTO_PATH_TIMEOUT and
+              time.time() - inventory_last_progress_at >= AUTO_PATH_TIMEOUT):
             if inventory_path_retries < AUTO_PATH_MAX_RETRIES:
                 retry_inventory_path()
             else:
