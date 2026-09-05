@@ -2169,8 +2169,10 @@ def start_training_here(label, radius, next_state, delay, pick_radius=None):
 
     try:
         ok_pos = set_training_position(p["region"], p["x"], p["y"], p["z"])
+        pos_error = False
     except Exception as ex:
         ok_pos = False
+        pos_error = True
         zlog("%s TRAIN ERRO set_training_position: %s" % (label, str(ex)))
 
     try:
@@ -2185,8 +2187,10 @@ def start_training_here(label, radius, next_state, delay, pick_radius=None):
 
     try:
         ok_start = start_bot()
+        start_error = False
     except Exception as ex:
         ok_start = False
+        start_error = True
         zlog("%s TRAIN ERRO start_bot: %s" % (label, str(ex)))
 
     if pick_radius is None:
@@ -2195,7 +2199,7 @@ def start_training_here(label, radius, next_state, delay, pick_radius=None):
     else:
         zlog("%s TRAIN -> position=%s radius=%s pick=%s start_bot=%s | R=%.1f PICK=%.1f" %
              (label, str(ok_pos), str(ok_radius), str(ok_pick), str(ok_start), radius, pick_radius))
-    if ok_pos and ok_start:
+    if not pos_error and not start_error:
         set_state(next_state, delay)
     else:
         set_state(STATE_IDLE)
