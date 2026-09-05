@@ -1135,6 +1135,14 @@ def find_npc_by_name(npc_name):
 def find_general():
     return find_npc_by_name(GENERAL_NAME)
 
+def is_current_inventory_npc_visible():
+    qdef = current_quest()
+    if not qdef:
+        return False
+    npc_name = qdef.get("npc", "")
+    uid, npc = find_npc_by_name(npc_name)
+    return uid is not None
+
 def remember_dialog_npc(npc_name, uid):
     global last_dialog_npc_uid, last_dialog_npc_name
     last_dialog_npc_uid = int(uid)
@@ -3570,7 +3578,7 @@ def event_loop():
     if state == STATE_INVENTORY_GO_NPC:
         target = inventory_target or inventory_target_pos("NPC")
         dist = get_distance_to(target[1], target[2]) if target else 999999.0
-        if dist <= INVENTORY_NPC_ARRIVAL_DISTANCE:
+        if dist <= INVENTORY_NPC_ARRIVAL_DISTANCE or is_current_inventory_npc_visible():
             qdef = current_quest()
             status = quest_status()
             zlog("CHEGOU no NPC Inventory | Q%d | distancia=%.1f | STATUS=%s" %
