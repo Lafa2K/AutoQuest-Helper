@@ -90,7 +90,7 @@ cbxReturnInstant = pCheckBox("blue", "", "Instant return", 550, 355)
 QtBind.setChecked(gui, cbxReturnSpecial, True)
 cbxSoundDone = pCheckBox("blue", "", "Beep on complete", 670, 355)
 QtBind.setChecked(gui, cbxSoundDone, True)
-pLabel("blue", "Blocos: Q1 General/Arena | Q2 Exorcist | Q3 Buda | Q4 Spirit Shell | Q5 Hunter | Q6 Manual | Q7 Zerk Manual | Q8 Final", 10, 385)
+pLabel("blue", "Blocks: Q1 General/Arena | Q2 Exorcist | Q3 Buddhist Priest | Q4 Spirit Shell | Q5 Hunter | Q6 Manual | Q7 Zerk Manual | Q8 Final", 10, 385)
 
 pLabel("inventory", "Inventory Expansion Quest", 10, 70)
 pLabel("inventory", "Status", 10, 95)
