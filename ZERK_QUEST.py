@@ -65,29 +65,28 @@ lblQuestStatus.append(pLabel("blue", "Q6: -", 360, 113))
 lblQuestStatus.append(pLabel("blue", "Q7: -", 360, 133))
 lblQuestStatus.append(pLabel("blue", "Q8: -", 360, 153))
 
-pButton("blue", "btnStartQ1", "QUEST 1", 10, 190)
-pButton("blue", "btnStartQ2", "QUEST 2", 110, 190)
-pButton("blue", "btnStartQ3", "QUEST 3", 210, 190)
-pButton("blue", "btnStartQ4", "QUEST 4", 310, 190)
-pButton("blue", "btnStopQ1", "STOP", 410, 190)
-pButton("blue", "btnStartQ5", "QUEST 5", 10, 225)
-pButton("blue", "btnStartQ6", "QUEST 6", 110, 225)
-pButton("blue", "btnStartQ7", "QUEST 7", 210, 225)
-pButton("blue", "btnStartQ8", "QUEST 8", 310, 225)
-pButton("blue", "btnQuestMobOn", "CHECK QUEST MOB", 410, 225)
+pButton("blue", "btnStartQ1", "QUEST 1", 10, 185)
+pButton("blue", "btnStartQ2", "QUEST 2", 110, 185)
+pButton("blue", "btnStartQ3", "QUEST 3", 210, 185)
+pButton("blue", "btnStartQ4", "QUEST 4", 10, 220)
+pButton("blue", "btnStartQ5", "QUEST 5", 110, 220)
+pButton("blue", "btnStartQ6", "QUEST 6", 210, 220)
+pButton("blue", "btnStartQ7", "QUEST 7", 10, 255)
+pButton("blue", "btnStartQ8", "QUEST 8", 110, 255)
+pButton("blue", "btnStopQ1", "STOP", 210, 255)
+pButton("blue", "btnQuestMobOn", "CHECK QUEST MOB", 310, 255)
 
-pLabel("blue", "Setup", 10, 305)
-cbxFindAutomaticPath = pCheckBox("blue", "", "Find automatic path", 10, 330)
+cbxFindAutomaticPath = pCheckBox("blue", "", "Find automatic path", 10, 295)
 QtBind.setChecked(gui, cbxFindAutomaticPath, True)
-cbxAutoFixQuestMob = pCheckBox("blue", "", "AutoFix quest mob", 160, 330)
+cbxAutoFixQuestMob = pCheckBox("blue", "", "AutoFix quest mob", 160, 295)
 QtBind.setChecked(gui, cbxAutoFixQuestMob, True)
-cbxReturnNormal = pCheckBox("blue", "", "Normal return", 310, 330)
-cbxReturnSpecial = pCheckBox("blue", "", "Special return", 430, 330)
-cbxReturnInstant = pCheckBox("blue", "", "Instant return", 550, 330)
+cbxReturnNormal = pCheckBox("blue", "", "Normal return", 310, 295)
+cbxReturnSpecial = pCheckBox("blue", "", "Special return", 430, 295)
+cbxReturnInstant = pCheckBox("blue", "", "Instant return", 550, 295)
 QtBind.setChecked(gui, cbxReturnSpecial, True)
-cbxSoundDone = pCheckBox("blue", "", "Beep on complete", 670, 330)
+cbxSoundDone = pCheckBox("blue", "", "Beep on complete", 670, 295)
 QtBind.setChecked(gui, cbxSoundDone, True)
-pLabel("blue", "Blocks: Q1 General/Arena | Q2 Exorcist | Q3 Buddhist Priest | Q4 Spirit Shell | Q5 Hunter | Q6 Manual | Q7 Zerk Manual | Q8 Final", 10, 360)
+pLabel("blue", "Blocks: Q1 General/Arena | Q2 Exorcist | Q3 Buddhist Priest | Q4 Spirit Shell | Q5 Hunter | Q6 Manual | Q7 Zerk Manual | Q8 Final", 10, 325)
 
 pLabel("inventory", "Status", 10, 70)
 lblInventoryStatus = []
@@ -95,12 +94,11 @@ lblInventoryStatus.append(pLabel("inventory", "Q1: -", 10, 93))
 lblInventoryStatus.append(pLabel("inventory", "Q2: -", 10, 113))
 lblInventoryStatus.append(pLabel("inventory", "Q3: -", 10, 133))
 lblInventoryStatus.append(pLabel("inventory", "Q4: -", 10, 153))
-pButton("inventory", "btnStartInvQ1", "QUEST 1", 10, 190)
-pButton("inventory", "btnStartInvQ2", "QUEST 2", 110, 190)
-pButton("inventory", "btnStartInvQ3", "QUEST 3", 210, 190)
-pButton("inventory", "btnStartInvQ4", "QUEST 4", 310, 190)
-pButton("inventory", "btnStopQ1", "STOP", 410, 190)
-pLabel("inventory", "Setup", 10, 235)
+pButton("inventory", "btnStartInvQ1", "QUEST 1", 10, 185)
+pButton("inventory", "btnStartInvQ2", "QUEST 2", 110, 185)
+pButton("inventory", "btnStartInvQ3", "QUEST 3", 210, 185)
+pButton("inventory", "btnStartInvQ4", "QUEST 4", 10, 220)
+pButton("inventory", "btnStopQ1", "STOP", 110, 220)
 cbxInventoryReverseWind = pCheckBox("inventory", "", "Use Reverse Scroll: Wind Town", 10, 260)
 pLabel("inventory", "Training areas: attack radius 25 / pick radius 50. Return uses selected Blue Zerk return checkbox.", 10, 290)
 
@@ -750,6 +748,7 @@ inventory_target_kind = ""
 inventory_last_distance = 999999.0
 inventory_last_progress_at = 0.0
 inventory_last_progress_log_at = 0.0
+inventory_reverse_next_kind = "NPC"
 handin_reward_retry_count = 0
 quest_accept_name_index = 0
 post_accept_ok_sent = False
@@ -1373,11 +1372,7 @@ def after_quest_active(qid, active):
     if active_chain == "inventory":
         if qdef:
             zlog("INVENTORY Q%d ATIVA -> indo para area de mob." % int(qdef["order"]))
-            if int(qdef["order"]) == 4 and should_inventory_reverse_wind():
-                zlog("INVENTORY Q4 -> reverse Wind Town marcado antes da area de mob.")
-                set_state(STATE_INVENTORY_REVERSE_WIND, 0.50)
-            else:
-                start_inventory_path("MOB", "Inventory Q%d -> area de mob." % int(qdef["order"]))
+            start_inventory_path("MOB", "Inventory Q%d -> area de mob." % int(qdef["order"]))
         else:
             set_state(STATE_DONE)
         return
@@ -1669,6 +1664,21 @@ def should_inventory_reverse_wind():
     except:
         return False
 
+def start_inventory_reverse_wind(next_kind="NPC"):
+    global inventory_reverse_next_kind
+    inventory_reverse_next_kind = next_kind
+    zlog("Inventory Q4 -> using Reverse Scroll: Wind Town before %s path." % next_kind)
+    set_state(STATE_INVENTORY_REVERSE_WIND, 0.50)
+
+def should_use_inventory_q4_reverse_to_npc():
+    if not should_inventory_reverse_wind() or is_current_inventory_npc_visible():
+        return False
+    target = inventory_target_pos("NPC")
+    if not target:
+        return False
+    dist = get_distance_to(target[1], target[2])
+    return dist > INVENTORY_NPC_ARRIVAL_DISTANCE
+
 def inventory_target_pos(kind):
     qdef = current_quest()
     if not qdef:
@@ -1770,11 +1780,10 @@ def route_inventory_step(source):
         start_inventory_path("NPC", "Inventory Q%d completa -> voltar ao NPC para entregar." % int(qdef["order"]))
         return
     if status == "ACTIVE":
-        if int(qdef["order"]) == 4 and should_inventory_reverse_wind():
-            zlog("Inventory Q4 ativa -> reverse Wind Town marcado antes da area de mob.")
-            set_state(STATE_INVENTORY_REVERSE_WIND, 0.50)
-            return
         start_inventory_path("MOB", "Inventory Q%d ativa -> ir para area de mob." % int(qdef["order"]))
+        return
+    if int(qdef["order"]) == 4 and should_use_inventory_q4_reverse_to_npc():
+        start_inventory_reverse_wind("NPC")
         return
     start_inventory_path("NPC", "Inventory Q%d nao ativa -> ir ao NPC para aceitar." % int(qdef["order"]))
 
@@ -3060,8 +3069,8 @@ def teleported():
 
     if state in (STATE_INVENTORY_REVERSE_WIND, STATE_INVENTORY_AFTER_REVERSE):
         stop_script()
-        zlog("TP REVERSE WIND -> indo para area de mob da Inventory.")
-        start_inventory_path("MOB", "Inventory Q4 reverse chegou -> area de mob.")
+        zlog("TP REVERSE WIND -> Inventory continuing to %s." % inventory_reverse_next_kind)
+        start_inventory_path(inventory_reverse_next_kind, "Inventory Q4 reverse arrived -> %s path." % inventory_reverse_next_kind)
         return
 
 def handle_event(t, data):
@@ -3646,11 +3655,7 @@ def event_loop():
         return
 
     if state == STATE_INVENTORY_RETURN_SCROLL:
-        qdef = current_quest()
-        if qdef and int(qdef["order"]) == 4 and should_inventory_reverse_wind():
-            use_return_scroll(STATE_INVENTORY_WAIT_TOWN, "INVENTORY Q4 REVERSE", INVENTORY_TOWN_CHECK_DELAY, INVENTORY_REVERSE_WIND_COMMAND, True, True)
-        else:
-            use_return_scroll(STATE_INVENTORY_WAIT_TOWN, "INVENTORY", INVENTORY_TOWN_CHECK_DELAY, selected_return_scroll_command())
+        use_return_scroll(STATE_INVENTORY_WAIT_TOWN, "INVENTORY", INVENTORY_TOWN_CHECK_DELAY, selected_return_scroll_command())
         return
 
     if state == STATE_INVENTORY_WAIT_TOWN:
@@ -3659,17 +3664,17 @@ def event_loop():
         return
 
     if state == STATE_INVENTORY_REVERSE_WIND:
-        zlog("INVENTORY Q4 -> usando reverse,location,Wind Town.")
+        zlog("INVENTORY Q4 -> using reverse,location,Wind Town.")
         try:
             start_script(INVENTORY_REVERSE_WIND_COMMAND + "\n")
             set_state(STATE_INVENTORY_AFTER_REVERSE, 5.0)
         except Exception as ex:
             zlog("INVENTORY Q4 REVERSE ERRO: %s" % str(ex))
-            start_inventory_path("MOB", "Inventory Q4 reverse falhou -> path direto para mob.")
+            start_inventory_path(inventory_reverse_next_kind, "Inventory Q4 reverse failed -> direct %s path." % inventory_reverse_next_kind)
         return
 
     if state == STATE_INVENTORY_AFTER_REVERSE:
-        start_inventory_path("MOB", "Inventory Q4 apos reverse -> area de mob.")
+        start_inventory_path(inventory_reverse_next_kind, "Inventory Q4 after reverse -> %s path." % inventory_reverse_next_kind)
         return
 
     if state == STATE_GO_Q3_DUNGEON:

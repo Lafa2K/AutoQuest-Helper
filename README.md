@@ -213,7 +213,7 @@ Inventory Q4 has an optional checkbox:
 Use Reverse Scroll: Wind Town
 ```
 
-Enable it if you want the plugin to use a saved reverse location before going to the monster area.
+Enable it if you want the plugin to use a saved reverse location before starting Inventory Q4. After Q4 is accepted, the plugin walks to the nearby monster area instead of spending another reverse scroll.
 
 ## Path Recovery
 
