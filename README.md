@@ -11,6 +11,12 @@ Inventory Expansion
 
 The Blue Zerk 95 tab covers only the first Chinese Blue Zerk chain, Q1 to Q8. It intentionally does not continue into `Army Test 2 (Chinese)` or later chains, because similar quest names can cause wrong routing if they are mixed together.
 
+## Interface
+
+Each quest tab has a scrollable status list.
+
+For short chains, you can use the direct `QUEST` buttons. For longer chains, select the quest in the list and click `START SELECTED`.
+
 ## Important Setup
 
 Before using the plugin, configure your phBot profile. The plugin can move, talk to NPCs, start training and resume steps, but it still depends on a working bot setup.

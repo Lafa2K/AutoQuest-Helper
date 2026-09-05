@@ -17,11 +17,11 @@ except:
 
 # ============================================================
 # ZERK QUEST
-# v0.82 - INVENTORY Q1-Q4
+# v0.83 - SCROLL UI
 # ============================================================
 
 pName = "ZERK QUEST"
-pVersion = "0.82-INVENTORY-Q1-Q4"
+pVersion = "0.83-SCROLL-UI"
 
 gui = QtBind.init(__name__, pName)
 
@@ -50,57 +50,51 @@ def pCheckBox(page, callback, text, x, y):
     widget = QtBind.createCheckBox(gui, callback, text, x, y)
     return register_page_widget(page, widget, x, y)
 
+def pList(page, x, y, w, h):
+    widget = QtBind.createList(gui, x, y, w, h)
+    return register_page_widget(page, widget, x, y)
+
 btnTabBlue = QtBind.createButton(gui, "btnShowBlueZerkTab", "Blue Zerk 95", 10, 10)
 btnTabInventory = QtBind.createButton(gui, "btnShowInventoryTab", "Inventory Expansion", 125, 10)
 lblPageTitle = QtBind.createLabel(gui, "Blue Zerk (level 95)", 10, 42)
 
 pLabel("blue", "Status", 10, 70)
-lblQuestStatus = []
-lblQuestStatus.append(pLabel("blue", "Q1: -", 10, 93))
-lblQuestStatus.append(pLabel("blue", "Q2: -", 10, 113))
-lblQuestStatus.append(pLabel("blue", "Q3: -", 10, 133))
-lblQuestStatus.append(pLabel("blue", "Q4: -", 10, 153))
-lblQuestStatus.append(pLabel("blue", "Q5: -", 360, 93))
-lblQuestStatus.append(pLabel("blue", "Q6: -", 360, 113))
-lblQuestStatus.append(pLabel("blue", "Q7: -", 360, 133))
-lblQuestStatus.append(pLabel("blue", "Q8: -", 360, 153))
+lstBlueQuestStatus = pList("blue", 10, 92, 650, 92)
 
-pButton("blue", "btnStartQ1", "QUEST 1", 10, 185)
-pButton("blue", "btnStartQ2", "QUEST 2", 110, 185)
-pButton("blue", "btnStartQ3", "QUEST 3", 210, 185)
-pButton("blue", "btnStartQ4", "QUEST 4", 10, 220)
-pButton("blue", "btnStartQ5", "QUEST 5", 110, 220)
-pButton("blue", "btnStartQ6", "QUEST 6", 210, 220)
-pButton("blue", "btnStartQ7", "QUEST 7", 10, 255)
-pButton("blue", "btnStartQ8", "QUEST 8", 110, 255)
-pButton("blue", "btnStopQ1", "STOP", 360, 220)
-pButton("blue", "btnQuestMobOn", "CHECK QUEST MOB", 360, 255)
+pButton("blue", "btnStartQ1", "QUEST 1", 10, 195)
+pButton("blue", "btnStartQ2", "QUEST 2", 110, 195)
+pButton("blue", "btnStartQ3", "QUEST 3", 210, 195)
+pButton("blue", "btnStartQ4", "QUEST 4", 10, 230)
+pButton("blue", "btnStartQ5", "QUEST 5", 110, 230)
+pButton("blue", "btnStartQ6", "QUEST 6", 210, 230)
+pButton("blue", "btnStartQ7", "QUEST 7", 10, 265)
+pButton("blue", "btnStartQ8", "QUEST 8", 110, 265)
+pButton("blue", "btnStartSelectedBlue", "START SELECTED", 210, 265)
+pButton("blue", "btnStopQ1", "STOP", 360, 230)
+pButton("blue", "btnQuestMobOn", "CHECK QUEST MOB", 360, 265)
 
-cbxFindAutomaticPath = pCheckBox("blue", "", "Find automatic path", 10, 295)
+cbxFindAutomaticPath = pCheckBox("blue", "", "Find automatic path", 10, 305)
 QtBind.setChecked(gui, cbxFindAutomaticPath, True)
-cbxAutoFixQuestMob = pCheckBox("blue", "", "AutoFix quest mob", 160, 295)
+cbxAutoFixQuestMob = pCheckBox("blue", "", "AutoFix quest mob", 160, 305)
 QtBind.setChecked(gui, cbxAutoFixQuestMob, True)
-cbxReturnNormal = pCheckBox("blue", "", "Normal return", 310, 295)
-cbxReturnSpecial = pCheckBox("blue", "", "Special return", 430, 295)
-cbxReturnInstant = pCheckBox("blue", "", "Instant return", 550, 295)
+cbxReturnNormal = pCheckBox("blue", "", "Normal return", 310, 305)
+cbxReturnSpecial = pCheckBox("blue", "", "Special return", 430, 305)
+cbxReturnInstant = pCheckBox("blue", "", "Instant return", 550, 305)
 QtBind.setChecked(gui, cbxReturnSpecial, True)
-cbxSoundDone = pCheckBox("blue", "", "Beep on complete", 670, 295)
+cbxSoundDone = pCheckBox("blue", "", "Beep on complete", 670, 305)
 QtBind.setChecked(gui, cbxSoundDone, True)
-pLabel("blue", "Blocks: Q1 General/Arena | Q2 Exorcist | Q3 Buddhist Priest | Q4 Spirit Shell | Q5 Hunter | Q6 Manual | Q7 Zerk Manual | Q8 Final", 10, 325)
+pLabel("blue", "Blocks: Q1 General/Arena | Q2 Exorcist | Q3 Buddhist Priest | Q4 Spirit Shell | Q5 Hunter | Q6 Manual | Q7 Zerk Manual | Q8 Final", 10, 335)
 
 pLabel("inventory", "Status", 10, 70)
-lblInventoryStatus = []
-lblInventoryStatus.append(pLabel("inventory", "Q1: -", 10, 93))
-lblInventoryStatus.append(pLabel("inventory", "Q2: -", 10, 113))
-lblInventoryStatus.append(pLabel("inventory", "Q3: -", 10, 133))
-lblInventoryStatus.append(pLabel("inventory", "Q4: -", 10, 153))
-pButton("inventory", "btnStartInvQ1", "QUEST 1", 10, 185)
-pButton("inventory", "btnStartInvQ2", "QUEST 2", 110, 185)
-pButton("inventory", "btnStartInvQ3", "QUEST 3", 210, 185)
-pButton("inventory", "btnStartInvQ4", "QUEST 4", 10, 220)
-pButton("inventory", "btnStopQ1", "STOP", 110, 220)
-cbxInventoryReverseWind = pCheckBox("inventory", "", "Use Reverse Scroll: Wind Town", 10, 260)
-pLabel("inventory", "Training areas: attack radius 25 / pick radius 50. Return uses selected Blue Zerk return checkbox.", 10, 290)
+lstInventoryQuestStatus = pList("inventory", 10, 92, 650, 92)
+pButton("inventory", "btnStartInvQ1", "QUEST 1", 10, 195)
+pButton("inventory", "btnStartInvQ2", "QUEST 2", 110, 195)
+pButton("inventory", "btnStartInvQ3", "QUEST 3", 10, 230)
+pButton("inventory", "btnStartInvQ4", "QUEST 4", 110, 230)
+pButton("inventory", "btnStartSelectedInventory", "START SELECTED", 210, 230)
+pButton("inventory", "btnStopQ1", "STOP", 360, 230)
+cbxInventoryReverseWind = pCheckBox("inventory", "", "Use Reverse Scroll: Wind Town", 10, 270)
+pLabel("inventory", "Training areas: attack radius 25 / pick radius 50. Return uses selected Blue Zerk return checkbox.", 10, 300)
 
 ZERK_1_QUESTS = [
     {"order": 1, "id": 346, "npc": "General Sonhyeon", "turnin_npc": "General Sonhyeon", "name": "Army Test 1 (Chinese)", "servername": "QNO_CH_HWAN_1_1", "state": "CURRENT"},
@@ -1013,6 +1007,9 @@ def log_chain():
 def status_html(text, color):
     return "<font color='%s'>%s</font>" % (color, text)
 
+def quest_status_line(qdef, state_text):
+    return "Q%d: %s - %s" % (int(qdef["order"]), state_text, qdef["name"])
+
 def refresh_status_ui():
     saved_chain = active_chain
 
@@ -1020,23 +1017,30 @@ def refresh_status_ui():
     active_order, active_status = active_chain_status()
     done_orders = completed_orders()
 
-    for i, q in enumerate(ZERK_1_QUESTS[:8]):
+    try:
+        QtBind.clear(gui, lstBlueQuestStatus)
+    except:
+        pass
+    for q in ZERK_1_QUESTS:
         state_text, color = quest_display_state(q, active_order, active_status, done_orders)
-
-        text = "Q%d: %s - %s" % (q["order"], state_text, q["name"])
+        q["state"] = state_text
         try:
-            QtBind.setText(gui, lblQuestStatus[i], status_html(text, color))
+            QtBind.append(gui, lstBlueQuestStatus, quest_status_line(q, state_text))
         except:
             pass
 
     set_active_chain_for_status("inventory")
     inv_active_order, inv_active_status = active_chain_status()
     inv_done_orders = completed_orders()
+    try:
+        QtBind.clear(gui, lstInventoryQuestStatus)
+    except:
+        pass
     for i, q in enumerate(INVENTORY_QUESTS):
         state_text, color = quest_display_state(q, inv_active_order, inv_active_status, inv_done_orders)
-        text = "Q%d: %s - %s" % (q["order"], state_text, q["name"])
+        q["state"] = state_text
         try:
-            QtBind.setText(gui, lblInventoryStatus[i], status_html(text, color))
+            QtBind.append(gui, lstInventoryQuestStatus, quest_status_line(q, state_text))
         except:
             pass
 
@@ -1828,6 +1832,29 @@ def btnStartInvQ3():
 
 def btnStartInvQ4():
     start_inventory_order(4)
+
+def selected_quest_order(widget, quests, chain_name):
+    try:
+        idx = QtBind.currentIndex(gui, widget)
+        if idx is None:
+            idx = -1
+        idx = int(idx)
+    except:
+        idx = -1
+    if idx < 0 or idx >= len(quests):
+        msg = "Select a quest from the %s list first." % chain_name
+        zlog(msg)
+        show_client_notice(msg)
+        return 0
+    try:
+        return int(quests[idx]["order"])
+    except:
+        return 0
+
+def btnStartSelectedInventory():
+    order = selected_quest_order(lstInventoryQuestStatus, INVENTORY_QUESTS, "Inventory Expansion")
+    if order > 0:
+        start_inventory_order(order)
 
 def btnResumeInventory():
     global current_quest_index, handin_reward_retry_count, quest_accept_name_index, post_accept_ok_sent
@@ -2950,6 +2977,25 @@ def btnStartQ8():
     log_chain()
 
     route_current_step("START Q8")
+
+def btnStartSelectedBlue():
+    order = selected_quest_order(lstBlueQuestStatus, ZERK_1_QUESTS, "Blue Zerk 95")
+    if order == 1:
+        btnStartQ1()
+    elif order == 2:
+        btnStartQ2()
+    elif order == 3:
+        btnStartQ3()
+    elif order == 4:
+        btnStartQ4()
+    elif order == 5:
+        btnStartQ5()
+    elif order == 6:
+        btnStartQ6()
+    elif order == 7:
+        btnStartQ7()
+    elif order == 8:
+        btnStartQ8()
 
 def btnResumeQuest():
     global death_seen, success_seen, confirm_ok_attempts, arena_started_at
