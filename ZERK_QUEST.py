@@ -17,11 +17,11 @@ except:
 
 # ============================================================
 # ZERK QUEST
-# v0.83 - SCROLL UI
+# v0.84 - ZERK 105 MAP
 # ============================================================
 
 pName = "ZERK QUEST"
-pVersion = "0.83-SCROLL-UI"
+pVersion = "0.84-ZERK105-MAP"
 
 gui = QtBind.init(__name__, pName)
 
@@ -30,7 +30,8 @@ HIDDEN_Y = 2000
 ui_page = "blue"
 page_widgets = {
     "blue": [],
-    "inventory": []
+    "inventory": [],
+    "zerk105": []
 }
 
 def register_page_widget(page, widget, x, y):
@@ -56,6 +57,7 @@ def pList(page, x, y, w, h):
 
 btnTabBlue = QtBind.createButton(gui, "btnShowBlueZerkTab", "Blue Zerk 95", 10, 10)
 btnTabInventory = QtBind.createButton(gui, "btnShowInventoryTab", "Inventory Expansion", 125, 10)
+btnTabZerk105 = QtBind.createButton(gui, "btnShowZerk105Tab", "Zerk 105", 285, 10)
 lblPageTitle = QtBind.createLabel(gui, "Blue Zerk (level 95)", 10, 42)
 
 pLabel("blue", "Status", 10, 70)
@@ -96,6 +98,12 @@ pButton("inventory", "btnStopQ1", "STOP", 360, 230)
 cbxInventoryReverseWind = pCheckBox("inventory", "", "Use Reverse Scroll: Wind Town", 10, 270)
 pLabel("inventory", "Training areas: attack radius 25 / pick radius 50. Return uses selected Blue Zerk return checkbox.", 10, 300)
 
+pLabel("zerk105", "Status", 10, 70)
+lstZerk105QuestStatus = pList("zerk105", 10, 92, 720, 250)
+pButton("zerk105", "btnStartSelectedZerk105", "START SELECTED", 10, 355)
+pButton("zerk105", "btnStopQ1", "STOP", 160, 355)
+pLabel("zerk105", "Mapped only for now. Temple/boss steps stay manual until the flow is validated.", 10, 390)
+
 ZERK_1_QUESTS = [
     {"order": 1, "id": 346, "npc": "General Sonhyeon", "turnin_npc": "General Sonhyeon", "name": "Army Test 1 (Chinese)", "servername": "QNO_CH_HWAN_1_1", "state": "CURRENT"},
     {"order": 2, "id": 347, "npc": "General Sonhyeon", "turnin_npc": "Exorcist Miaoryeong", "next": "Exorcist Miaoryeong", "name": "Material for medicine (Chinese)", "servername": "QNO_CH_HWAN_1_2", "state": "LOCKED"},
@@ -112,6 +120,30 @@ INVENTORY_QUESTS = [
     {"order": 2, "id": 0, "npc": "Grocery Trader Yeosun", "turnin_npc": "Grocery Trader Yeosun", "name": "Inventory Expansion 2 (China)", "servername": "QSP_WC_EXINVENTORY_2", "npc_pos": (26265, 3514.0, 1993.0, 0.0), "mob_area": (25754, 3773.0, 1577.0, 0.0), "state": "LOCKED"},
     {"order": 3, "id": 0, "npc": "Jewel Lapidary Mamoje", "turnin_npc": "Jewel Lapidary Mamoje", "name": "Inventory Expansion 3 (Common)", "servername": "QSP_KT_EXINVENTORY_3", "npc_pos": (23431, 86.0, -2.0, 0.0), "mob_area": (23676, -2051.0, 89.0, 0.0), "state": "LOCKED"},
     {"order": 4, "id": 0, "npc": "Towner Anashya", "turnin_npc": "Towner Anashya", "name": "Inventory Expansion 4 (Common)", "servername": "QSP_RM_EXINVENTORY_4", "npc_pos": (23155, -3765.0, -302.0, 0.0), "mob_area": (22895, -4586.0, -385.0, 0.0), "reverse_location": "Wind Town", "state": "LOCKED"},
+]
+
+ZERK_105_QUESTS = [
+    {"order": 1, "npc": "Governor Senmute", "turnin_npc": "Governor Senmute", "name": "The Suspicious Sacrifice", "servername": "QNO_SD_MA_001", "npc_pos": (23343, -16757.0, -158.0, 0.0), "mob_areas": [{"name": "Uneg", "pos": (22834, -16309.0, -439.0, 0.0)}], "train_radius": 50.0, "pick_radius": 50.0, "state": "CURRENT"},
+    {"order": 2, "npc": "Doctor Renenutet", "turnin_npc": "Doctor Renenutet", "name": "The Ceremonial Tool", "servername": "QNO_SD_MA_002", "npc_pos": (23087, -16720.0, -382.0, 0.0), "mob_areas": [{"name": "Sand Raider", "pos": (22324, -15895.0, -876.0, 0.0)}], "train_radius": 50.0, "pick_radius": 50.0, "state": "LOCKED"},
+    {"order": 3, "npc": "Finance Officer Maneto", "turnin_npc": "Finance Officer Maneto", "name": "His Protesting Son", "servername": "QNO_SD_MA_003", "npc_pos": (23345, -16448.0, -79.0, 0.0), "state": "LOCKED"},
+    {"order": 4, "npc": "Finance Officer Maneto", "turnin_npc": "Finance Officer Maneto", "name": "Stopping the Ceremony", "servername": "QNO_SD_MA_004", "npc_pos": (23345, -16448.0, -79.0, 0.0), "mob_areas": [{"name": "Uneg", "pos": (22834, -16309.0, -439.0, 0.0)}, {"name": "Sand Raider", "pos": (22324, -15895.0, -876.0, 0.0)}], "train_radius": 50.0, "pick_radius": 50.0, "state": "LOCKED"},
+    {"order": 5, "npc": "Governor Senmute", "turnin_npc": "Governor Senmute", "name": "The Missing High Priest (1)", "servername": "QNO_SD_MA_005", "npc_pos": (23343, -16757.0, -158.0, 0.0), "state": "LOCKED"},
+    {"order": 6, "npc": "Doctor Renenutet", "turnin_npc": "Doctor Renenutet", "name": "The Missing High Priest (2)", "servername": "QNO_SD_MA_006", "npc_pos": (23087, -16720.0, -382.0, 0.0), "state": "LOCKED"},
+    {"order": 7, "npc": "Finance Officer Maneto", "turnin_npc": "Finance Officer Maneto", "name": "Berenice's Traces", "servername": "QNO_SD_MA_007", "npc_pos": (23345, -16448.0, -79.0, 0.0), "mob_areas": [{"name": "Tathen", "pos": (23861, -15600.0, 237.0, 0.0)}], "train_radius": 50.0, "pick_radius": 50.0, "state": "LOCKED"},
+    {"order": 8, "npc": "Finance Officer Maneto", "turnin_npc": "Finance Officer Maneto", "name": "The Heartbreaking News (1)", "servername": "QNO_SD_MA_008", "npc_pos": (23345, -16448.0, -79.0, 0.0), "state": "LOCKED"},
+    {"order": 9, "npc": "Doctor Renenutet", "turnin_npc": "Doctor Renenutet", "name": "The Heartbreaking News (2)", "servername": "QNO_SD_MA_009", "npc_pos": (23087, -16720.0, -382.0, 0.0), "state": "LOCKED"},
+    {"order": 10, "npc": "Finance Officer Maneto", "turnin_npc": "Finance Officer Maneto", "name": "An Ominous Sense", "servername": "QNO_SD_MA_010", "npc_pos": (23345, -16448.0, -79.0, 0.0), "state": "LOCKED"},
+    {"order": 11, "npc": "Governor Senmute", "turnin_npc": "Governor Senmute", "name": "Investigating the Strange Rumor", "servername": "QNO_SD_MA_011", "npc_pos": (23343, -16757.0, -158.0, 0.0), "state": "LOCKED"},
+    {"order": 12, "npc": "Doctor Renenutet", "turnin_npc": "Doctor Renenutet", "name": "The Truth of the Strange Rumor (1)", "servername": "QNO_SD_MA_012", "npc_pos": (23087, -16720.0, -382.0, 0.0), "mob_areas": [{"name": "Dark Khepri", "pos": (19258, -14768.0, -3152.0, 0.0)}, {"name": "Desert Bug", "pos": (19259, -14500.0, -3129.0, 0.0)}], "train_radius": 50.0, "pick_radius": 50.0, "state": "LOCKED"},
+    {"order": 13, "npc": "Doctor Renenutet", "turnin_npc": "Doctor Renenutet", "name": "The Truth of the Strange Rumor (2)", "servername": "QNO_SD_MA_013", "npc_pos": (23087, -16720.0, -382.0, 0.0), "mob_areas": [{"name": "Dark Sandman", "pos": (19262, -13976.0, -3118.0, 0.0)}, {"name": "Blood Sandman", "pos": (19263, -13693.0, -3179.0, 0.0)}, {"name": "Blood Hyena", "pos": (19265, -13308.0, -3122.0, 0.0)}], "train_radius": 50.0, "pick_radius": 50.0, "state": "LOCKED"},
+    {"order": 14, "npc": "Doctor Renenutet", "turnin_npc": "Doctor Renenutet", "name": "The Truth of the Strange Rumor (3)", "servername": "QNO_SD_MA_014", "npc_pos": (23087, -16720.0, -382.0, 0.0), "mob_areas": [{"name": "Ure'uth", "pos": (19523, -12922.0, -3069.0, 0.0)}, {"name": "Mehen", "pos": (19269, -12613.0, -3126.0, 0.0)}, {"name": "Aker", "pos": (19270, -12320.0, -3216.0, 0.0)}], "train_radius": 50.0, "pick_radius": 50.0, "state": "LOCKED"},
+    {"order": 15, "npc": "Doctor Renenutet", "turnin_npc": "Doctor Renenutet", "name": "Deranged Mentuhotep", "servername": "QNO_SD_MA_015", "npc_pos": (23087, -16720.0, -382.0, 0.0), "state": "LOCKED"},
+    {"order": 16, "npc": "Governor Senmute", "turnin_npc": "Governor Senmute", "name": "Proving My Abilities", "servername": "QNO_SD_MA_016", "npc_pos": (23343, -16757.0, -158.0, 0.0), "mob_areas": [{"name": "Apis", "pos": (19019, -11372.0, -3277.0, 0.0)}], "manual": True, "state": "LOCKED"},
+    {"order": 17, "npc": "Governor Senmute", "turnin_npc": "Governor Senmute", "name": "The Overdriving Heart (1)", "servername": "QNO_SD_MA_017", "npc_pos": (23343, -16757.0, -158.0, 0.0), "mob_areas": [{"name": "Sphinx (Tomb Beginner)", "pos": (19019, -11372.0, -3277.0, 0.0)}], "manual": True, "state": "LOCKED"},
+    {"order": 18, "npc": "Governor Senmute", "turnin_npc": "Governor Senmute", "name": "The Overdriving Heart (2)", "servername": "QNO_SD_MA_018", "npc_pos": (23343, -16757.0, -158.0, 0.0), "mob_areas": [{"name": "Sekhmet (Tomb Beginner)", "pos": (19019, -11372.0, -3277.0, 0.0)}], "manual": True, "state": "LOCKED"},
+    {"order": 19, "npc": "Governor Senmute", "turnin_npc": "Governor Senmute", "name": "The Overdriving Heart (3)", "servername": "QNO_SD_MA_019", "npc_pos": (23343, -16757.0, -158.0, 0.0), "mob_areas": [{"name": "Nephthys (Tomb Beginner)", "pos": (19019, -11372.0, -3277.0, 0.0)}], "manual": True, "state": "LOCKED"},
+    {"order": 20, "npc": "Governor Senmute", "turnin_npc": "Governor Senmute", "name": "The Overdriving Heart (4)", "servername": "QNO_SD_MA_020", "npc_pos": (23343, -16757.0, -158.0, 0.0), "mob_areas": [{"name": "Horus (Tomb Beginner)", "pos": (19019, -11372.0, -3277.0, 0.0)}], "manual": True, "state": "LOCKED"},
+    {"order": 21, "npc": "Governor Senmute", "turnin_npc": "Governor Senmute", "name": "The Overdriving Heart (5)", "servername": "QNO_SD_MA_021", "npc_pos": (23343, -16757.0, -158.0, 0.0), "mob_areas": [{"name": "Osiris (Tomb Beginner)", "pos": (19019, -11372.0, -3277.0, 0.0)}], "manual": True, "state": "LOCKED"},
 ]
 
 active_chain = "blue"
@@ -766,7 +798,8 @@ def show_ui_page(page):
     ui_page = page
     titles = {
         "blue": "Blue Zerk (level 95)",
-        "inventory": "Inventory Expansion Quest"
+        "inventory": "Inventory Expansion Quest",
+        "zerk105": "Zerk 105 Prerequisites"
     }
     try:
         QtBind.setText(gui, lblPageTitle, titles.get(page, page))
@@ -793,6 +826,11 @@ def btnShowInventoryTab():
     show_ui_page("inventory")
     refresh_status_ui()
 
+def btnShowZerk105Tab():
+    set_active_chain_for_status("zerk105")
+    show_ui_page("zerk105")
+    refresh_status_ui()
+
 def btnInventoryPlaceholder():
     msg = "Inventory Expansion Quest is not configured yet. Add NPCs, quest names and coordinates first."
     zlog(msg)
@@ -808,16 +846,22 @@ def set_active_chain_for_status(chain):
     active_chain = chain
 
 def current_quest_list():
+    if active_chain == "zerk105":
+        return ZERK_105_QUESTS
     if active_chain == "inventory":
         return INVENTORY_QUESTS
     return ZERK_1_QUESTS
 
 def chain_progress_field():
+    if active_chain == "zerk105":
+        return "zerk105_done"
     if active_chain == "inventory":
         return "inventory_done"
     return "done"
 
 def chain_label():
+    if active_chain == "zerk105":
+        return "ZERK105"
     if active_chain == "inventory":
         return "INVENTORY"
     return "ZERK"
@@ -1008,7 +1052,16 @@ def status_html(text, color):
     return "<font color='%s'>%s</font>" % (color, text)
 
 def quest_status_line(qdef, state_text):
-    return "Q%d: %s - %s" % (int(qdef["order"]), state_text, qdef["name"])
+    suffix = ""
+    try:
+        mobs = qdef.get("mob_areas", [])
+        if mobs:
+            suffix = " -> " + " / ".join([str(m.get("name", "")) for m in mobs if m.get("name")])
+        if bool(qdef.get("manual", False)):
+            suffix += " [MANUAL]"
+    except:
+        suffix = ""
+    return "Q%d: %s - %s%s" % (int(qdef["order"]), state_text, qdef["name"], suffix)
 
 def refresh_status_ui():
     saved_chain = active_chain
@@ -1041,6 +1094,21 @@ def refresh_status_ui():
         q["state"] = state_text
         try:
             QtBind.append(gui, lstInventoryQuestStatus, quest_status_line(q, state_text))
+        except:
+            pass
+
+    set_active_chain_for_status("zerk105")
+    z105_active_order, z105_active_status = active_chain_status()
+    z105_done_orders = completed_orders()
+    try:
+        QtBind.clear(gui, lstZerk105QuestStatus)
+    except:
+        pass
+    for q in ZERK_105_QUESTS:
+        state_text, color = quest_display_state(q, z105_active_order, z105_active_status, z105_done_orders)
+        q["state"] = state_text
+        try:
+            QtBind.append(gui, lstZerk105QuestStatus, quest_status_line(q, state_text))
         except:
             pass
 
@@ -1855,6 +1923,27 @@ def btnStartSelectedInventory():
     order = selected_quest_order(lstInventoryQuestStatus, INVENTORY_QUESTS, "Inventory Expansion")
     if order > 0:
         start_inventory_order(order)
+
+def btnStartSelectedZerk105():
+    global current_quest_index
+    set_active_chain_for_status("zerk105")
+    order = selected_quest_order(lstZerk105QuestStatus, ZERK_105_QUESTS, "Zerk 105")
+    if order <= 0:
+        return
+    current_quest_index = order - 1
+    qdef = current_quest()
+    zlog("========================================")
+    zlog("ZERK 105 MAPPED STEP")
+    zlog("Q%d -> %s | %s" % (order, qdef.get("name", ""), qdef.get("servername", "")))
+    zlog("NPC -> %s | %s" % (qdef.get("npc", ""), str(qdef.get("npc_pos", ""))))
+    for mob in qdef.get("mob_areas", []):
+        zlog("MOB -> %s | %s" % (mob.get("name", ""), str(mob.get("pos", ""))))
+    if bool(qdef.get("manual", False)):
+        show_client_notice("Zerk 105 Q%d is mapped as manual for now. Use the list as a guide." % order)
+    else:
+        show_client_notice("Zerk 105 Q%d is mapped only. Automation will be added after validation." % order)
+    zlog("========================================")
+    refresh_status_ui()
 
 def btnResumeInventory():
     global current_quest_index, handin_reward_retry_count, quest_accept_name_index, post_accept_ok_sent
@@ -3699,6 +3788,10 @@ def event_loop():
         if status in ("COMPLETED", "OBJECTIVES_COMPLETED"):
             stop_bot()
             qdef = current_quest()
+            if qdef and int(qdef.get("order", 0)) == 4:
+                zlog("Inventory Q4 objetivo completo -> voltando a pe para o NPC.")
+                start_inventory_path("NPC", "Inventory Q4 completa -> voltar andando ao NPC de entrega.")
+                return
             zlog("Inventory Q%d objetivo completo -> Return Scroll selecionado." %
                  (int(qdef["order"]) if qdef else 0))
             set_state(STATE_INVENTORY_RETURN_SCROLL, INVENTORY_RETURN_SCROLL_DELAY)
@@ -3918,7 +4011,7 @@ def event_loop():
             set_state(STATE_DONE)
         return
 
-zlog("===== ZERK QUEST v0.82-INVENTORY-Q1-Q4 CARREGADO =====")
+zlog("===== ZERK QUEST v0.84-ZERK105-MAP CARREGADO =====")
 zlog("Q1 arena: ao entrar, fixa treino local 50/50 e liga o bot ate TP de saida.")
 zlog("PATH WATCHDOG: aguarda 12s de path; se ficar parado 5s -> retry/manual.")
 zlog("Reward final: 0x7515 + close NPC 0x704B com fallback de UID salvo.")
@@ -3931,6 +4024,8 @@ zlog("Q4 Tombstone: distancia ao destino controla progresso; se path falhar, agu
 zlog("Return Scroll: escolha Normal/Special/Instant nos checkboxes.")
 zlog("Q5 Hunter usa rotina real do NPC: SELECT > OPEN > TALK 06 > REWARD.")
 zlog("Q6/Q7 completas fora de Jangan usam o scroll selecionado e entregam OK + Reward.")
+zlog("Inventory Q4 volta andando ao NPC depois do farm; reverse Wind Town so ajuda a iniciar perto do NPC.")
+zlog("Zerk 105: aba/lista mapeada com 21 prerequisitos; automacao sera adicionada por blocos.")
 zlog("Q7 aceita Piece of Spirit e para com ClientNotice para zerk manual.")
 zlog("Q8 final: Exorcist Miaoryeong -> General Sonhyeon -> OK + Reward.")
 zlog("Inventory Expansion Q1-Q4: NPC -> mob area R25/PICK50 -> return -> Reward.")

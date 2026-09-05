@@ -6,10 +6,13 @@ Current modules:
 
 ```text
 Blue Zerk 95
+Zerk 105
 Inventory Expansion
 ```
 
 The Blue Zerk 95 tab covers only the first Chinese Blue Zerk chain, Q1 to Q8. It intentionally does not continue into `Army Test 2 (Chinese)` or later chains, because similar quest names can cause wrong routing if they are mixed together.
+
+The Zerk 105 tab currently maps the 21 prerequisite quests. It is a guide/status tab first; automation will be added by blocks after each route is validated.
 
 ## Interface
 
@@ -220,6 +223,8 @@ Use Reverse Scroll: Wind Town
 ```
 
 Enable it if you want the plugin to use a saved reverse location before starting Inventory Q4. After Q4 is accepted, the plugin walks to the nearby monster area instead of spending another reverse scroll.
+
+After the Q4 monster objective is done, the plugin walks back to Towner Anashya instead of using a return scroll.
 
 ## Path Recovery
 
