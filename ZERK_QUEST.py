@@ -73,8 +73,8 @@ pButton("blue", "btnStartQ5", "QUEST 5", 110, 220)
 pButton("blue", "btnStartQ6", "QUEST 6", 210, 220)
 pButton("blue", "btnStartQ7", "QUEST 7", 10, 255)
 pButton("blue", "btnStartQ8", "QUEST 8", 110, 255)
-pButton("blue", "btnStopQ1", "STOP", 210, 255)
-pButton("blue", "btnQuestMobOn", "CHECK QUEST MOB", 310, 255)
+pButton("blue", "btnStopQ1", "STOP", 360, 220)
+pButton("blue", "btnQuestMobOn", "CHECK QUEST MOB", 360, 255)
 
 cbxFindAutomaticPath = pCheckBox("blue", "", "Find automatic path", 10, 295)
 QtBind.setChecked(gui, cbxFindAutomaticPath, True)
@@ -596,6 +596,7 @@ INVENTORY_TRAIN_CHECK_DELAY = 2.0
 INVENTORY_RETURN_SCROLL_DELAY = 3.0
 INVENTORY_TOWN_CHECK_DELAY = 4.0
 INVENTORY_REVERSE_WIND_COMMAND = "reverse,location,Wind Town"
+INVENTORY_AFTER_REVERSE_DELAY = 5.0
 INVENTORY_PATH_STUCK_SECONDS = 5.0
 INVENTORY_PATH_PROGRESS_EPSILON = 4.0
 HUNTER_AUTO_PATH_TIMEOUT = 45.0
@@ -3067,10 +3068,11 @@ def teleported():
         start_inventory_path("NPC", "Inventory retorno -> NPC de entrega.")
         return
 
-    if state in (STATE_INVENTORY_REVERSE_WIND, STATE_INVENTORY_AFTER_REVERSE):
+    if state == STATE_INVENTORY_REVERSE_WIND:
         stop_script()
-        zlog("TP REVERSE WIND -> Inventory continuing to %s." % inventory_reverse_next_kind)
-        start_inventory_path(inventory_reverse_next_kind, "Inventory Q4 reverse arrived -> %s path." % inventory_reverse_next_kind)
+        zlog("TP REVERSE WIND -> waiting %.1fs before Inventory %s path." %
+             (INVENTORY_AFTER_REVERSE_DELAY, inventory_reverse_next_kind))
+        set_state(STATE_INVENTORY_AFTER_REVERSE, INVENTORY_AFTER_REVERSE_DELAY)
         return
 
 def handle_event(t, data):
@@ -3667,13 +3669,14 @@ def event_loop():
         zlog("INVENTORY Q4 -> using reverse,location,Wind Town.")
         try:
             start_script(INVENTORY_REVERSE_WIND_COMMAND + "\n")
-            set_state(STATE_INVENTORY_AFTER_REVERSE, 5.0)
+            set_state(STATE_INVENTORY_AFTER_REVERSE, INVENTORY_AFTER_REVERSE_DELAY)
         except Exception as ex:
             zlog("INVENTORY Q4 REVERSE ERRO: %s" % str(ex))
             start_inventory_path(inventory_reverse_next_kind, "Inventory Q4 reverse failed -> direct %s path." % inventory_reverse_next_kind)
         return
 
     if state == STATE_INVENTORY_AFTER_REVERSE:
+        zlog("Inventory Q4 reverse wait done -> starting %s path." % inventory_reverse_next_kind)
         start_inventory_path(inventory_reverse_next_kind, "Inventory Q4 after reverse -> %s path." % inventory_reverse_next_kind)
         return
 
